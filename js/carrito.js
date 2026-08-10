@@ -5,6 +5,7 @@
 =========================================
 */
 
+import { iniciarSesionYRegistrarCliente } from "./auth-cliente.js";
 
 let carrito = 
 JSON.parse(
@@ -18,7 +19,39 @@ localStorage.getItem("carrito")
 // AGREGAR PRODUCTO AL CARRITO
 // =================================
 
-export function agregarCarrito(id){
+export async function agregarCarrito(id){
+
+
+// Primero exigimos login con Google (y registramos/actualizamos
+// al cliente en Firestore). Si el usuario ya tenía sesión iniciada,
+// esto no vuelve a abrir el popup.
+try{
+
+await iniciarSesionYRegistrarCliente();
+
+}catch(error){
+
+if(error.code === "auth/popup-closed-by-user"){
+
+// El usuario cerró el popup sin iniciar sesión:
+// no agregamos el producto y salimos.
+return;
+
+}
+
+console.error(
+"Error al iniciar sesión / registrar cliente:",
+error
+);
+
+alert(
+"No se pudo iniciar sesión. Intenta de nuevo."
+);
+
+return;
+
+}
+
 
 
 let existe =
