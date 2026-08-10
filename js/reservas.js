@@ -10,6 +10,8 @@ import { db } from "../firebase/config.js";
 
 import { avisarAdmin } from "../js/notificar_whatsapp.js";
 
+import { iniciarSesionYRegistrarCliente } from "../js/auth-cliente.js";
+
 
 import {
 collection,
@@ -181,6 +183,63 @@ e.preventDefault();
 
 
 
+// Exigimos login con Google (y registramos/actualizamos al
+// cliente en Firestore) antes de guardar la reserva. Si el
+// usuario ya tenía sesión iniciada, esto no vuelve a abrir
+// el popup.
+
+let usuario;
+
+
+try{
+
+usuario =
+await iniciarSesionYRegistrarCliente();
+
+}
+
+catch(error){
+
+
+if(error.code === "auth/popup-closed-by-user"){
+
+
+// El usuario cerró el popup sin iniciar sesión:
+// no creamos la reserva y salimos.
+
+return;
+
+
+}
+
+
+
+console.error(
+
+"Error al iniciar sesión / registrar cliente:",
+
+error
+
+);
+
+
+
+alert(
+
+"No se pudo iniciar sesión. Intenta de nuevo."
+
+);
+
+
+
+return;
+
+
+}
+
+
+
+
 let inicio =
 Number(selectInicio.value);
 
@@ -232,6 +291,10 @@ horas * PRECIO_HORA;
 
 
 let reserva = {
+
+
+clienteId:
+usuario.uid,
 
 
 fecha:
