@@ -14,7 +14,7 @@ import {
 
 
 // Configuración Firebase
-import { db } from "./firebase.js";
+import { db } from "../../firebase/config.js";
 
 
 // =========================================
